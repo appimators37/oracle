@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  oracle-apex:
+    build: .
+    container_name: 23cfree
+    ports:
+      - "8521:1521"  # Database
+      - "8500:5500"  # EM Express
+      - "8023:8080"  # APEX HTTP
+      - "9043:8443"  # APEX HTTPS
+      - "9922:22"    # SSH
+    environment:
+      - ORACLE_PWD=E
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - oracle_backup:/opt/oracle/backup
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "sys/${ORACLE_PWD}@//localhost:1521/FREE as sysdba", "@healthcheck.sql"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  oracle_data:
+  oracle_backup:
